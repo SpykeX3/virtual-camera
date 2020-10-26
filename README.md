@@ -4,7 +4,7 @@ We are going to create software that will create virtual video input devices and
 ## Risks
 - Writing drivers for Windows seems complicated.
 - After the failure of the previous project our team is demotivated.
-- The project requires a lot of research.
+- Creating UI for editor may require a lot of efforts.
 ## Technology Stack
 C/C++ for drivers, ??? for client.
 ## MVP
