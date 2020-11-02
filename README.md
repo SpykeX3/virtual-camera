@@ -6,7 +6,7 @@ We are going to create software that will create virtual video input devices and
 - After the failure of the previous project our team is demotivated.
 - Creating UI for editor may require a lot of efforts.
 ## Technology Stack
-Java, Open CV, Loopback
+Java, OpenCV, v4l2 loopback
 ## MVP
 Date: mid-december.
 Features: .
