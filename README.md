@@ -1,6 +1,6 @@
 # Virtual camera
 ## Main idea
-We are going to create software that will create virtual video input devices and control their content, for example, loop video file, or compose multiple inputs in one. Target platforms are Windows and Linux.
+We are going to create software that will create virtual video input devices and control their content, for example, loop video file, or compose multiple inputs in one. Target platform is Linux.
 ## Risks
 - Writing drivers for Windows seems complicated.
 - After the failure of the previous project our team is demotivated.
