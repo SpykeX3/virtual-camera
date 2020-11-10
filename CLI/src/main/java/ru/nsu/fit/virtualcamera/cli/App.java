@@ -71,7 +71,8 @@ public class App {
             .put("module_name", "device_output")
             .put("args", new JSONArray().put(target).put(jsonObject));
 
-        new RequestHandler().sendPOST(jsonObject.toString(), DAEMON_URL);
+        new RequestHandler().sendPOST(
+            jsonObject.toString(), DAEMON_URL + "/api/devices/video0/configure");
 
       }
     } catch (ParseException e) {
