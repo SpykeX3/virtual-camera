@@ -1,4 +1,5 @@
-package ru.nsu.fit.oop.VirtualCamera.Engine;
+package ru.nsu.fit.VirtualCamera.Engine;
+
 /**
  * Frame output stream interface.
  */

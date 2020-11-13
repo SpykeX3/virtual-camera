@@ -1,10 +1,10 @@
-package ru.nsu.fit.oop.VirtualCamera.Engine;
+package ru.nsu.fit.VirtualCamera.Engine;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Class for functioonal block
+ * Class for functional block
  */
 public abstract class FunctionalBlock implements Runnable {
 
@@ -129,13 +129,15 @@ public abstract class FunctionalBlock implements Runnable {
      * Creates new Frame and returns it.
      * @return new frame created by this block.
      */
-    abstract Frame performWork();
+    public abstract Frame performWork();
 
     /**
      * Hear all inputStreams and update input frames with new versions
      */
     private void updateFrames()
     {
+        while (inputFrames.size() < inputStreams.size())
+            inputFrames.add(null);
         int id = 0;
         for (FrameInputStream inputStream : inputStreams)
         {

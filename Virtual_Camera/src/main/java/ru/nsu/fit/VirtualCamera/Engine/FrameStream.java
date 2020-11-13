@@ -1,6 +1,7 @@
-package ru.nsu.fit.oop.VirtualCamera.Engine;
+package ru.nsu.fit.VirtualCamera.Engine;
 import java.util.LinkedList;
 import java.util.Queue;
+
 
 /**
  * Class for frame stream

@@ -4,6 +4,7 @@ plugins {
 }
 
 group 'org.example'
+
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -13,7 +14,8 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'com.sun.net.httpserver', name: 'http', version: '20070405'
-
+//    compile group: 'org.openpnp', name: 'opencv', version: '4.3.0-2'
+    implementation files('libraries/opencv-450.jar')
 }
 
 application {
