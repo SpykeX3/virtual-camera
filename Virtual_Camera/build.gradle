@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
 group 'org.example'
@@ -16,6 +17,12 @@ dependencies {
     compile group: 'com.sun.net.httpserver', name: 'http', version: '20070405'
 //    compile group: 'org.openpnp', name: 'opencv', version: '4.3.0-2'
     implementation files('libraries/opencv-450.jar')
+
+}
+
+javafx {
+    version = "14"
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.swing' ]
 }
 
 application {
