@@ -17,15 +17,17 @@ dependencies {
     compile group: 'com.sun.net.httpserver', name: 'http', version: '20070405'
 //    compile group: 'org.openpnp', name: 'opencv', version: '4.3.0-2'
     implementation files('libraries/opencv-450.jar')
+    //compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.34.v20201102'
+    compile group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: '9.4.34.v20201102'
 
 }
 
 javafx {
     version = "14"
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.swing' ]
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.swing']
 }
 
 application {
     // Define the main class for the application
-    mainClassName = 'ru.nsu.fit.VirtualCamera.Engine.Master.Server'
+    mainClassName = 'ru.nsu.fit.VirtualCamera.Engine.Master.WSServer'
 }
