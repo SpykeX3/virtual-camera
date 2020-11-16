@@ -9,11 +9,12 @@ import org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter;
 import javax.servlet.ServletException;
 
 public class WSServer {
+  Server server;
 
-  public static void main(String[] args) {
-    Server server = new Server();
+  public WSServer(int port) throws ServletException {
+    server = new Server();
     ServerConnector connector = new ServerConnector(server);
-    connector.setPort(8080);
+    connector.setPort(port);
     server.addConnector(connector);
 
     ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -25,16 +26,27 @@ public class WSServer {
         (servletContext, nativeWebSocketConfiguration) -> {
           nativeWebSocketConfiguration.getPolicy().setMaxTextMessageBufferSize(65535);
 
-          nativeWebSocketConfiguration.addMapping("/api/", WSServer.class);
+          nativeWebSocketConfiguration.addMapping("/api/", MasterWebSocket.class);
         });
 
-    try {
-      WebSocketUpgradeFilter.configure(context);
-    } catch (ServletException e) {
-      e.printStackTrace();
-    }
+    WebSocketUpgradeFilter.configure(context);
+  }
 
+  public void start() throws Exception {
+    server.start();
+  }
+
+  public void join() throws InterruptedException {
+    server.join();
+  }
+
+  public void stop() throws Exception {
+    server.stop();
+  }
+
+  public static void main(String[] args) {
     try {
+      WSServer server = new WSServer(8080);
       server.start();
       server.join();
     } catch (Throwable t) {
