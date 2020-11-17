@@ -9,3 +9,19 @@ The command line interface currently supports sending linear configuration reque
 ```
 -d video1 -t video2 block1 block2
 ```
+
+## Details
+Currently the CLI connects to the daemon via WebSocket. Currently it supports the following:
+* Configuration requests
+
+### Configuration requests
+Configuration requests are JSON with the following structure:
+```json
+{
+  "command": "configure",
+  "body": {
+      "module_name": "module",
+      "args": ["other", "modules"]
+  }
+}
+```
