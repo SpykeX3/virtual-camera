@@ -7,7 +7,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -83,8 +82,7 @@ public class App {
 
         try {
           client.start();
-          ClientUpgradeRequest request = new ClientUpgradeRequest();
-          client.connect(socket, new URI(DESTINATION), request);
+          client.connect(socket, new URI(DESTINATION));
           socket.getLatch().await();
           socket.sendMessage(jsonObject.toString());
           Thread.sleep(1000);
