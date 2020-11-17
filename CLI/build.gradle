@@ -29,6 +29,9 @@ dependencies {
 
     compile 'commons-cli:commons-cli:1.4'
     compile group: 'org.json', name: 'json', version: '20190722'
+
+    // https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-client
+    compile group: 'org.eclipse.jetty.websocket', name: 'websocket-client', version: '9.4.34.v20201102'
 }
 
 application {

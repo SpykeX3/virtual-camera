@@ -1,16 +1,19 @@
 package ru.nsu.fit.virtualcamera.cli;
 
+import java.net.URI;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class App {
-  private static final String DAEMON_URL = "http://localhost:5150";
+  private static final String DESTINATION = "ws://localhost:8080/api/";
 
   public static void main(String[] args) {
 
@@ -71,9 +74,29 @@ public class App {
             .put("module_name", "device_output")
             .put("args", new JSONArray().put(target).put(jsonObject));
 
-        new RequestHandler().sendPOST(
-            jsonObject.toString(), DAEMON_URL + "/api/devices/video0/configure");
+        jsonObject = new JSONObject()
+            .put("command", "configure")
+            .put("body", jsonObject);
 
+        ClientSocket socket = new ClientSocket();
+        WebSocketClient client = new WebSocketClient();
+
+        try {
+          client.start();
+          ClientUpgradeRequest request = new ClientUpgradeRequest();
+          client.connect(socket, new URI(DESTINATION), request);
+          socket.getLatch().await();
+          socket.sendMessage(jsonObject.toString());
+          Thread.sleep(1000);
+        } catch (Exception e) {
+          e.printStackTrace();
+        } finally {
+          try {
+            client.stop();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
       }
     } catch (ParseException e) {
       e.printStackTrace();
