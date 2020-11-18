@@ -1,5 +1,8 @@
 package ru.nsu.fit.virtualcamera.cli;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
@@ -10,6 +13,7 @@ import org.apache.commons.cli.ParseException;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class App {
   private static final String DESTINATION = "ws://localhost:8080/api/";
@@ -21,7 +25,8 @@ public class App {
     options.addOption("t", "target", true, "Target device")
         .addOption("v", "vsource", true, "Source video")
         .addOption("d", "dsource", true, "Source device")
-        .addOption("h", "help", false, "Get help");
+        .addOption("h", "help", false, "Get help")
+        .addOption("f", "file", true, "Read JSON from file");
 
     try {
       CommandLine cmd = new DefaultParser().parse(options, args);
@@ -31,7 +36,7 @@ public class App {
         formatter.printHelp("[-h] [-t target] [-v vsource | -d dsource]", options);
       } else {
 
-        if (!cmd.hasOption("v") && !cmd.hasOption("d")) {
+        if (!cmd.hasOption("v") && !cmd.hasOption("d") && !cmd.hasOption("f")) {
           System.out.println("Source not specified");
           System.exit(1);
         }
@@ -40,42 +45,56 @@ public class App {
         String target = null;
         if (cmd.hasOption("t")) {
           target = cmd.getOptionValue("t");
-        } else {
+        } else if (!cmd.hasOption("f")) {
           System.out.println("Target not specified");
           System.exit(1);
         }
 
         List<String> mods = cmd.getArgList();
-        JSONObject jsonObject;
+        JSONObject jsonObject = null;
 
-        if (cmd.hasOption("v")) {
-          String vsource = cmd.getOptionValue("v");
+        if (cmd.hasOption("f")) {
+          try (FileReader reader = new FileReader(cmd.getOptionValue("f"))) {
 
-          jsonObject = new JSONObject()
-              .put("module_name", "video_input")
-              .put("args", new JSONArray().put(vsource));
+            JSONTokener tokener = new JSONTokener(reader);
 
+            jsonObject = new JSONObject(tokener);
+          } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         } else {
-          String dsource = cmd.getOptionValue("d");
+
+          if (cmd.hasOption("v")) {
+            String vsource = cmd.getOptionValue("v");
+
+            jsonObject = new JSONObject()
+                .put("module_name", "video_input")
+                .put("args", new JSONArray().put(vsource));
+
+          } else {
+            String dsource = cmd.getOptionValue("d");
+
+            jsonObject = new JSONObject()
+                .put("module_name", "device_input")
+                .put("args", new JSONArray().put(dsource));
+          }
+
+          for (String mod : mods) {
+            jsonObject = new JSONObject()
+                .put("module_name", mod)
+                .put("args", new JSONArray().put(jsonObject));
+          }
 
           jsonObject = new JSONObject()
-              .put("module_name", "device_input")
-              .put("args", new JSONArray().put(dsource));
-        }
+              .put("module_name", "device_output")
+              .put("args", new JSONArray().put(target).put(jsonObject));
 
-        for (String mod : mods) {
           jsonObject = new JSONObject()
-              .put("module_name", mod)
-              .put("args", new JSONArray().put(jsonObject));
+              .put("command", "configure")
+              .put("body", jsonObject);
         }
-
-        jsonObject = new JSONObject()
-            .put("module_name", "device_output")
-            .put("args", new JSONArray().put(target).put(jsonObject));
-
-        jsonObject = new JSONObject()
-            .put("command", "configure")
-            .put("body", jsonObject);
 
         ClientSocket socket = new ClientSocket();
         WebSocketClient client = new WebSocketClient();
