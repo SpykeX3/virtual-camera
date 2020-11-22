@@ -174,7 +174,7 @@ public abstract class FunctionalBlock implements Runnable {
                 }
                 catch (InterruptedException e)
                 {
-
+                    return;
                 }
             }
 
