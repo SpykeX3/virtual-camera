@@ -1,13 +1,14 @@
 package ru.nsu.fit.VirtualCamera.Engine.Master;
 
 import java.io.IOException;
-import java.util.Locale;
-
+import org.json.JSONException;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import org.json.JSONObject;
 
 public class MasterWebSocket extends WebSocketAdapter {
+  static ConfigurationHandler configurator = new ConfigurationHandler();
+
   @Override
   public void onWebSocketConnect(Session sess) {
     super.onWebSocketConnect(sess);
@@ -19,9 +20,27 @@ public class MasterWebSocket extends WebSocketAdapter {
     super.onWebSocketText(message);
     System.out.println("Received TEXT message: " + message);
     try {
-      getSession().getRemote().sendString(message);
-    } catch (IOException e) {
-      e.printStackTrace();
+      JSONObject request = new JSONObject(message);
+      if (!request.has("command")) {
+        throw new IllegalArgumentException("No field 'command' was found in request");
+      }
+      String command = request.getString("command");
+      switch (command) {
+        case "configure":
+          {
+            if (!request.has("body")) {
+              throw new IllegalArgumentException("No field 'body' was found in request");
+            }
+            configurator.process(request.getJSONObject("body"));
+            reply("New configuration is loaded");
+            break;
+          }
+        default:
+          reply("Unsupported option");
+      }
+
+    } catch (IllegalArgumentException | JSONException e) {
+      reply(e.toString());
     }
   }
 
@@ -35,5 +54,13 @@ public class MasterWebSocket extends WebSocketAdapter {
   public void onWebSocketError(Throwable cause) {
     super.onWebSocketError(cause);
     cause.printStackTrace(System.err);
+  }
+
+  private void reply(String message) {
+    try {
+      getSession().getRemote().sendString(message);
+    } catch (IOException e) {
+      e.printStackTrace(); // TODO log errors
+    }
   }
 }

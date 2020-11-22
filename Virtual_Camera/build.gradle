@@ -14,12 +14,10 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'com.sun.net.httpserver', name: 'http', version: '20070405'
 //    compile group: 'org.openpnp', name: 'opencv', version: '4.3.0-2'
     implementation files('libraries/opencv-450.jar')
-    //compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.34.v20201102'
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: '9.4.34.v20201102'
-
+    compile group: 'org.json', name: 'json', version: '20190722'
 }
 
 javafx {
