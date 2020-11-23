@@ -75,7 +75,7 @@ public abstract class FunctionalBlock implements Runnable {
      * @param outputStream - stream to add
      * @param position - position in list
      */
-    public void addIOutputStream(FrameOutputStream outputStream, int position)
+    public void addOutputStream(FrameOutputStream outputStream, int position)
     {
         outputStreams.add(position, outputStream);
     }
@@ -134,20 +134,27 @@ public abstract class FunctionalBlock implements Runnable {
     /**
      * Hear all inputStreams and update input frames with new versions
      */
-    private void updateFrames()
+    private boolean updateFrames() throws InterruptedException
     {
         while (inputFrames.size() < inputStreams.size())
             inputFrames.add(null);
         int id = 0;
+        boolean last = false;
         for (FrameInputStream inputStream : inputStreams)
         {
-            Frame frame = inputStream.read();
-            if (frame != null)
-            {
-                inputFrames.set(id, frame);
+            Frame frame = null;
+            synchronized (inputStream) {
+                frame = inputStream.read();
+                if (frame == null) {
+                    inputStream.wait();
+                    frame = inputStream.read();
+                }
             }
+            last |= frame.isLast();
+            inputFrames.set(id, frame);
             id++;
         }
+        return last;
     }
 
     /**
@@ -177,11 +184,21 @@ public abstract class FunctionalBlock implements Runnable {
                     return;
                 }
             }
-
-            updateFrames();
-
+            boolean isLastFrames;
+            try {
+                isLastFrames = updateFrames();
+            }
+            catch (InterruptedException e)
+            {
+                isAlive = false;
+                break;
+            }
             Frame frame = performWork();
-
+            if (isLastFrames)
+            {
+                frame.setLast(true);
+                isAlive = false;
+            }
             send(frame);
         }
     }

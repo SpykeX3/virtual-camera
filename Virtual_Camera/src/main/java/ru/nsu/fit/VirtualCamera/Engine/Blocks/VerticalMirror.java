@@ -12,7 +12,7 @@ public class VerticalMirror extends FunctionalBlock {
         Mat src = inputFrames.get(0).getMatrix();
         Mat dst = new Mat();
 
-        Core.flip(src, dst, 1);
+        Core.flip(src, dst, 0);
 
 
         Frame frame = new Frame(dst);

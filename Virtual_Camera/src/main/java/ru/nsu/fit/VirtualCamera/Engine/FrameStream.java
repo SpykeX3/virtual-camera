@@ -35,6 +35,7 @@ public class FrameStream implements FrameInputStream, FrameOutputStream{
     public boolean write(Frame frame) {
         synchronized (this)
         {
+            this.notifyAll();
             return data.add(frame);
         }
     }
