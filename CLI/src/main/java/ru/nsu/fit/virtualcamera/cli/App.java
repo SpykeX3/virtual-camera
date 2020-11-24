@@ -71,25 +71,29 @@ public class App {
 
             jsonObject = new JSONObject()
                 .put("module_name", "video_input")
-                .put("args", new JSONArray().put(vsource));
+                .put("args", new JSONArray().put(vsource))
+                .put("inputs", new JSONArray());
 
           } else {
             String dsource = cmd.getOptionValue("d");
 
             jsonObject = new JSONObject()
                 .put("module_name", "device_input")
-                .put("args", new JSONArray().put(dsource));
+                .put("args", new JSONArray().put(dsource))
+                .put("inputs", new JSONArray());
           }
 
           for (String mod : mods) {
             jsonObject = new JSONObject()
                 .put("module_name", mod)
-                .put("args", new JSONArray().put(jsonObject));
+                .put("inputs", new JSONArray().put(jsonObject))
+                .put("args", new JSONArray());
           }
 
           jsonObject = new JSONObject()
               .put("module_name", "device_output")
-              .put("args", new JSONArray().put(target).put(jsonObject));
+              .put("inputs", new JSONArray().put(jsonObject))
+              .put("args", new JSONArray().put(target));
 
           jsonObject = new JSONObject()
               .put("command", "configure")

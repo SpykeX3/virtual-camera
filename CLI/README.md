@@ -28,8 +28,32 @@ Configuration requests are JSON with the following structure:
 {
   "command": "configure",
   "body": {
-      "module_name": "module",
-      "args": ["other", "modules"]
+    "module_name": "module",
+    "inputs": ["other", "modules"],
+    "args": ["arguments", "for", "blocks"]
+  }
+}
+```
+In case of reading configuration from command line (rather than file), the arguments arrays are empty for all functional blocks except the source video/device and target device where the video/device is passed as single argument. Example of such request:
+```json
+{
+  "command": "configure",
+  "args": ["video1"],
+  "body": {
+    "module_name": "device_output",
+    "inputs": [
+      {
+        "module_name": "block1",
+        "args": [],
+        "inputs": [
+          {
+            "module_name": "video_input",
+            "args": "/file.avi",
+            "inputs": []
+          }
+        ]
+      }
+    ]
   }
 }
 ```
