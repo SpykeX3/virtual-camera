@@ -6,16 +6,16 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfRect;
-import org.opencv.core.Rect;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.util.List;
+import java.util.Random;
 
 public class CaptureApp extends Application {
 
@@ -45,23 +45,30 @@ public class CaptureApp extends Application {
             System.out.println("Ну дурааак, закинь в res какую-нибудь картинку с названием faces.jpg");
             return;
         }
-        MatOfRect mat = FaceDetector.detectFaces(image);
-        Rect rectArray[] = mat.toArray();
+        List<List<Point>> faces = FacemarkOnImage.findFacemarkOnMat(image);
         Pane root = new Pane();
         Scene currScene = new Scene(root);
         ImageView imageView = new ImageView();
-        //imageView.setImage(toJavafxImage(FaceMask.drowCirkles(image)));
+        imageView.setImage(toJavafxImage(image));
         root.getChildren().add(imageView);
-
-        for (Rect r : rectArray){
-            Rectangle curr = new Rectangle();
-            curr.setX(r.x);
-            curr.setY(r.y);
-            curr.setHeight(r.height);
-            curr.setWidth(r.width);
-            root.getChildren().add(curr);
+        Random rand = new Random();
+        float r,g,b;
+        for (List<Point> face_point: faces){
+            r = rand.nextFloat();
+            g = rand.nextFloat();
+            b = rand.nextFloat();
+            Color randomColor = new Color(r, g, b, 1);
+            for (int i = 0; i < face_point.size(); ++i){
+                Circle circle = new Circle();
+                circle.setStroke(randomColor);
+                circle.setStrokeWidth(1);
+                circle.setFill(randomColor);
+                circle.setRadius(2);
+                circle.setCenterX(face_point.get(i).x);
+                circle.setCenterY(face_point.get(i).y);
+                root.getChildren().add(circle);
+            }
         }
-
         primaryStage.setScene(currScene);
         primaryStage.setHeight(600);
         primaryStage.setMinWidth(800);
