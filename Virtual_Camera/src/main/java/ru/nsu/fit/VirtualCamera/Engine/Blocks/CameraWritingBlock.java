@@ -13,6 +13,7 @@ public class CameraWritingBlock extends FunctionalBlock {
 
   private static FakeCam fakecam = new FakeCam();
   private int fd;
+  private int framesCount = 0;
 
   public CameraWritingBlock(String name, int width, int height) {
     fd = fakecam.open(name, width, height);
@@ -49,18 +50,22 @@ public class CameraWritingBlock extends FunctionalBlock {
   }
 
   @Override
-  public Frame performWork() {
+  public Frame performWork() throws InterruptedException {
     Mat mat = inputFrames.get(0).getMatrix();
     int width = mat.cols();
     int height = mat.height();
     byte[] frame = new byte[(int) mat.total() * mat.channels()];
     mat.get(0, 0, frame);
-    fakecam.writeFrame(fd, frame);
-    try {
-      Thread.sleep(33);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+
+    // TODO remove this hotfix :-D
+    for (int i = 0; i < frame.length; i += 3) {
+      byte tmp = frame[i];
+      frame[i] = frame[i + 2];
+      frame[i + 2] = tmp;
     }
+
+    fakecam.writeFrame(fd, frame);
+    Thread.sleep(25);
     return null;
   }
 

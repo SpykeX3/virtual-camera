@@ -5,11 +5,16 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.server.NativeWebSocketServletContainerInitializer;
 import org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter;
+import org.opencv.core.Core;
 
 import javax.servlet.ServletException;
 
 public class WSServer {
   Server server;
+
+  static {
+    System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+  }
 
   public WSServer(int port) throws ServletException {
     server = new Server();

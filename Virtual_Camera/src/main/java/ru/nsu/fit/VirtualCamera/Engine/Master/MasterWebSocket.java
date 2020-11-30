@@ -63,4 +63,8 @@ public class MasterWebSocket extends WebSocketAdapter {
       e.printStackTrace(); // TODO log errors
     }
   }
+
+  static void clean() {
+    configurator.stopBlocks();
+  }
 }
