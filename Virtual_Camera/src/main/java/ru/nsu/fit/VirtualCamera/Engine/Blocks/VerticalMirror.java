@@ -9,30 +9,25 @@ import java.util.List;
 
 public class VerticalMirror extends FunctionalBlock {
 
-    public VerticalMirror(List<String> args) throws Exception
-    {
-        validateArgs(args);
-    }
+  public VerticalMirror(List<String> args) throws Exception {
+    validateArgs(args);
+  }
 
-    @Override
-    protected void validateArgs(List<String> args) throws Exception {
+  @Override
+  protected void validateArgs(List<String> args) throws Exception {}
 
-    }
+  @Override
+  public Frame performWork() {
+    if (inputFrames.get(0) == null) return null;
+    Mat src = inputFrames.get(0).getMatrix();
+    Mat dst = new Mat();
+    Core.flip(src, dst, 0);
 
-    @Override
-    public Frame performWork() {
-        if (inputFrames.get(0) == null) return null;
-        Mat src = inputFrames.get(0).getMatrix();
-        Mat dst = new Mat();
-        Core.flip(src, dst, 0);
+    Frame frame = new Frame(dst);
 
-        Frame frame = new Frame(dst);
+    return frame;
+  }
 
-        return frame;
-    }
-
-    @Override
-    protected void aftermath() {
-
-    }
+  @Override
+  protected void aftermath() {}
 }

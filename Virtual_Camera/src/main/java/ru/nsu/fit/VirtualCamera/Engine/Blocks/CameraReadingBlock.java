@@ -9,54 +9,44 @@ import ru.nsu.fit.VirtualCamera.Engine.FunctionalBlock;
 
 import java.util.List;
 
-public class CameraReadingBlock extends FunctionalBlock
-{
+public class CameraReadingBlock extends FunctionalBlock {
 
-    private VideoCapture capture;
-    public CameraReadingBlock(List<String> args) throws Exception
-    {
-        validateArgs(args);
-        capture = new VideoCapture();
-        capture.open(Integer.parseInt(args.get(0)));
-    }
+  private VideoCapture capture;
 
-    public double getFPS()
-    {
-        return capture.get(Videoio.CAP_PROP_FPS);
-    }
+  public CameraReadingBlock(List<String> args) throws Exception {
+    validateArgs(args);
+    capture = new VideoCapture();
+    capture.open(Integer.parseInt(args.get(0)));
+  }
 
-    public int getFourcc()
-    {
-        return (int)capture.get(Videoio.CAP_PROP_FOURCC);
-    }
+  public double getFPS() {
+    return capture.get(Videoio.CAP_PROP_FPS);
+  }
 
-    public Size getSize()
-    {
-        Size size = new Size();
-        size.height = capture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
-        size.width = capture.get(Videoio.CAP_PROP_FRAME_WIDTH);
-        return size;
-    }
+  public int getFourcc() {
+    return (int) capture.get(Videoio.CAP_PROP_FOURCC);
+  }
 
+  public Size getSize() {
+    Size size = new Size();
+    size.height = capture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
+    size.width = capture.get(Videoio.CAP_PROP_FRAME_WIDTH);
+    return size;
+  }
 
-    @Override
-    protected void validateArgs(List<String> args) throws Exception
-    {
-        if (args.size() != 1) throw new Exception("Invalid args number");
-        Integer.parseInt(args.get(0));
-    }
+  @Override
+  protected void validateArgs(List<String> args) throws Exception {
+    if (args.size() != 1) throw new Exception("Invalid args number");
+    Integer.parseInt(args.get(0));
+  }
 
-    @Override
-    public Frame performWork()
-    {
-        Mat mat = new Mat();
-        Frame frame = new Frame(mat);
-        return frame;
-    }
+  @Override
+  public Frame performWork() {
+    Mat mat = new Mat();
+    Frame frame = new Frame(mat);
+    return frame;
+  }
 
-    @Override
-    protected void aftermath()
-    {
-
-    }
+  @Override
+  protected void aftermath() {}
 }
