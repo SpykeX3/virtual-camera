@@ -50,7 +50,7 @@ public class CaptureApp extends Application {
         Pane root = new Pane();
         Scene currScene = new Scene(root);
         ImageView imageView = new ImageView();
-        imageView.setImage(toJavafxImage(image));
+        //imageView.setImage(toJavafxImage(FaceMask.drowCirkles(image)));
         root.getChildren().add(imageView);
 
         for (Rect r : rectArray){
