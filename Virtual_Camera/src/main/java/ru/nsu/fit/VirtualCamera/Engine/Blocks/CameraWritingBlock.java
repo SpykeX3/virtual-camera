@@ -6,6 +6,7 @@ import com.harium.hci.fakecam.FakeCam;
 import ru.nsu.fit.VirtualCamera.Engine.Frame;
 import ru.nsu.fit.VirtualCamera.Engine.FunctionalBlock;
 
+import java.io.File;
 import java.util.List;
 
 public class CameraWritingBlock extends FunctionalBlock {
@@ -17,13 +18,38 @@ public class CameraWritingBlock extends FunctionalBlock {
     fd = fakecam.open(name, width, height);
   }
 
+  public CameraWritingBlock(List<String> args) {
+    int width = Integer.parseInt(args.get(1));
+    int height = Integer.parseInt(args.get(2));
+    fd = fakecam.open(args.get(0), width, height);
+  }
+
   public void close() {
     fakecam.close(fd);
   }
 
   @Override
+  protected void validateArgs(List<String> args) throws Exception {
+    if (args.size() != 3) {
+      throw new IllegalArgumentException();
+    }
+    try {
+      int width = Integer.parseInt(args.get(1));
+      int height = Integer.parseInt(args.get(2));
+      if (height <= 0 || width <= 0) {
+        throw new IllegalArgumentException();
+      }
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException();
+    }
+    File file = new File(args.get(0));
+    if (!file.exists() || !file.canWrite()) {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  @Override
   public Frame performWork() {
-    System.out.println("Writing a frame");
     Mat mat = inputFrames.get(0).getMatrix();
     int width = mat.cols();
     int height = mat.height();
@@ -36,5 +62,10 @@ public class CameraWritingBlock extends FunctionalBlock {
       e.printStackTrace();
     }
     return null;
+  }
+
+  @Override
+  protected void aftermath() {
+    close();
   }
 }
