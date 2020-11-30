@@ -8,13 +8,26 @@ import org.opencv.videoio.Videoio;
 import ru.nsu.fit.VirtualCamera.Engine.Frame;
 import ru.nsu.fit.VirtualCamera.Engine.FunctionalBlock;
 
+import java.nio.file.FileSystemAlreadyExistsException;
+import java.util.List;
+
 public class FileWritingBlock extends FunctionalBlock
 {
 
     private VideoWriter writer;
-    public FileWritingBlock(String name, int fourcc, double fps, Size frameSize, boolean isColor)
+    public FileWritingBlock(List<String> args) throws Exception
     {
-        writer = new VideoWriter(name, fourcc, fps, frameSize, isColor);
+        validateArgs(args);
+
+        String name = args.get(0);
+        int fourcc = Integer.parseInt(args.get(1));
+        double fps = Double.parseDouble(args.get(2));
+        Size size = new Size();
+        size.height = Double.parseDouble(args.get(3));
+        size.width = Double.parseDouble(args.get(4));
+        boolean isColor = Boolean.parseBoolean(args.get(5));
+
+        writer = new VideoWriter(name, fourcc, fps, size, isColor);
     }
 
 
@@ -26,7 +39,25 @@ public class FileWritingBlock extends FunctionalBlock
     @Override
     public Frame performWork()
     {
+
         writer.write(inputFrames.get(0).getMatrix());
         return null;
     }
+
+    @Override
+    protected void aftermath()
+    {
+        close();
+    }
+
+    @Override
+    protected void validateArgs(List<String> args) throws Exception {
+        if (args.size() != 6) throw new Exception("Invalid number of args");
+        Integer.parseInt(args.get(1));
+        Double.parseDouble(args.get(2));
+        Double.parseDouble(args.get(3));
+        Double.parseDouble(args.get(4));
+        if (!(args.get(5).compareTo("true") == 0 || args.get(5).compareTo("false") == 0)) throw new Exception("Invalid boolean value");
+    }
+
 }

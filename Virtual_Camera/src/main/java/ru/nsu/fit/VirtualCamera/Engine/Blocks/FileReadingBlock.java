@@ -7,16 +7,24 @@ import org.opencv.videoio.Videoio;
 import ru.nsu.fit.VirtualCamera.Engine.Frame;
 import ru.nsu.fit.VirtualCamera.Engine.FunctionalBlock;
 
+import java.io.File;
+import java.util.List;
+
 public class FileReadingBlock extends FunctionalBlock
 {
 
     private VideoCapture capture;
     private boolean markLastFrame;
-    public FileReadingBlock(String name, boolean markLastFrame)
+    public FileReadingBlock(List<String> args) throws Exception
     {
+        validateArgs(args);
         capture = new VideoCapture();
+
+        String name = args.get(0);
+
         capture.open(name);
-        this.markLastFrame = markLastFrame;
+
+        this.markLastFrame = Boolean.parseBoolean(args.get(1));
     }
 
     public double getFPS()
@@ -39,6 +47,15 @@ public class FileReadingBlock extends FunctionalBlock
 
 
     @Override
+    protected void validateArgs(List<String> args) throws Exception
+    {
+        if (args.size() != 2) throw new Exception("Invalid number of args");
+        File f = new File(args.get(0));
+        if (!f.exists() || f.isDirectory()) throw new Exception("Invalid file");
+        if (!(args.get(1).compareTo("true") == 0 || args.get(1).compareTo("false") == 0)) throw new Exception("Invalid boolean value");
+    }
+
+    @Override
     public Frame performWork()
     {
         Mat mat = new Mat();
@@ -48,5 +65,11 @@ public class FileReadingBlock extends FunctionalBlock
             kill();
         }
         return frame;
+    }
+
+    @Override
+    protected void aftermath()
+    {
+
     }
 }

@@ -7,14 +7,17 @@ import org.opencv.videoio.Videoio;
 import ru.nsu.fit.VirtualCamera.Engine.Frame;
 import ru.nsu.fit.VirtualCamera.Engine.FunctionalBlock;
 
+import java.util.List;
+
 public class CameraReadingBlock extends FunctionalBlock
 {
 
     private VideoCapture capture;
-    public CameraReadingBlock(int id)
+    public CameraReadingBlock(List<String> args) throws Exception
     {
+        validateArgs(args);
         capture = new VideoCapture();
-        capture.open(id);
+        capture.open(Integer.parseInt(args.get(0)));
     }
 
     public double getFPS()
@@ -37,10 +40,23 @@ public class CameraReadingBlock extends FunctionalBlock
 
 
     @Override
+    protected void validateArgs(List<String> args) throws Exception
+    {
+        if (args.size() != 1) throw new Exception("Invalid args number");
+        Integer.parseInt(args.get(0));
+    }
+
+    @Override
     public Frame performWork()
     {
         Mat mat = new Mat();
         Frame frame = new Frame(mat);
         return frame;
+    }
+
+    @Override
+    protected void aftermath()
+    {
+
     }
 }

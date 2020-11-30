@@ -1,6 +1,8 @@
 package ru.nsu.fit.VirtualCamera.Engine;
+import java.io.BufferedInputStream;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.Semaphore;
 
 
 /**
@@ -10,33 +12,55 @@ public class FrameStream implements FrameInputStream, FrameOutputStream{
 
     private Queue<Frame> data;
 
+    private int BUFFER_SIZE = 10;
+    private Semaphore freeSpace;
+    private Semaphore takenSpace;
+
     /**
      * Create frame stream object. Should be used by manager
       */
     public FrameStream()
     {
         data = new LinkedList<>();
+        freeSpace = new Semaphore(BUFFER_SIZE);
+        takenSpace = new Semaphore(0);
+    }
+
+    public FrameStream(int BUFFER_SIZE)
+    {
+        data = new LinkedList<>();
+        this.BUFFER_SIZE = BUFFER_SIZE;
+        freeSpace = new Semaphore(BUFFER_SIZE);
+        takenSpace = new Semaphore(0);
     }
 
 
     @Override
-    public Frame read() {
-        synchronized (this)
+    public Frame read()
+    {
+        try {
+            takenSpace.acquire();
+            Frame res = data.poll();
+            freeSpace.release();
+            return res;
+        }
+        catch (Exception e)
         {
-            if (data.size() == 0)
-            {
-                return null;
-            }
-            return data.poll();
+            return null;
         }
     }
 
     @Override
     public boolean write(Frame frame) {
-        synchronized (this)
+        try {
+            freeSpace.acquire();
+            data.add(frame);
+            takenSpace.release();
+            return true;
+        }
+        catch (Exception e)
         {
-            this.notifyAll();
-            return data.add(frame);
+            return false;
         }
     }
 }

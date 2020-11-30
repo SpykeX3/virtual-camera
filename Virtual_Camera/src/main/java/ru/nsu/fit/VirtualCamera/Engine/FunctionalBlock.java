@@ -24,6 +24,8 @@ public abstract class FunctionalBlock implements Runnable {
         inputFrames = new LinkedList<>();
     }
 
+    protected abstract void validateArgs(List<String> args) throws Exception;
+
     /**
      * Add input stream to the end of input streams list
      * @param inputStream stream to add
@@ -142,13 +144,9 @@ public abstract class FunctionalBlock implements Runnable {
         boolean last = false;
         for (FrameInputStream inputStream : inputStreams)
         {
-            Frame frame = null;
-            synchronized (inputStream) {
+            Frame frame = inputStream.read();
+            if (frame == null) {
                 frame = inputStream.read();
-                if (frame == null) {
-                    inputStream.wait();
-                    frame = inputStream.read();
-                }
             }
             last |= frame.isLast();
             inputFrames.set(id, frame);
@@ -160,13 +158,19 @@ public abstract class FunctionalBlock implements Runnable {
     /**
      * Write frame to output streams
      */
-    private void send(Frame frame)
+    private void send(Frame frame) throws InterruptedException
     {
         for (FrameOutputStream outputStream : outputStreams)
         {
-            outputStream.write(frame);
+            if (!outputStream.write(frame))
+            {
+            //    outputStream.wait();
+                outputStream.write(frame);
+            }
         }
     }
+
+    protected abstract void aftermath();
 
     @Override
     public void run()
@@ -190,16 +194,25 @@ public abstract class FunctionalBlock implements Runnable {
             }
             catch (InterruptedException e)
             {
-                isAlive = false;
+                kill();
                 break;
             }
             Frame frame = performWork();
             if (isLastFrames)
             {
-                frame.setLast(true);
-                isAlive = false;
+                if (frame != null)
+                    frame.setLast(true);
+                kill();
             }
-            send(frame);
+            try {
+                send(frame);
+            }
+            catch (InterruptedException e)
+            {
+                kill();
+                break;
+            }
         }
+        aftermath();
     }
 }
