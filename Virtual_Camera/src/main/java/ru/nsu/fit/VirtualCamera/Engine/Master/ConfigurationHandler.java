@@ -27,7 +27,7 @@ public class ConfigurationHandler {
     startBlocks();
   }
 
-  private void stopBlocks() {
+  void stopBlocks() {
     for (FunctionalBlock block : activeBlocks) {
       block.kill();
     }
@@ -84,6 +84,7 @@ public class ConfigurationHandler {
     }
     FunctionalBlock createdBlock;
     createdBlock = createBlockByName(moduleName, Objects.requireNonNullElseGet(argList, ArrayList::new));
+    System.out.println("Created "+createdBlock.getClass().getName());
     for (FrameStream input : inputsList) {
       createdBlock.addInputStream(input);
     }
