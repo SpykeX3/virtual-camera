@@ -1,16 +1,14 @@
 package ru.nsu.fit.VirtualCamera.Engine.Blocks.facedetection;
 
-import javafx.scene.shape.Line;
 import org.opencv.core.*;
 import org.opencv.face.*;
-import org.opencv.imgcodecs.*;
 import org.opencv.imgproc.*;
-import org.opencv.objdetect.*;
+import org.opencv.objdetect.CascadeClassifier;
 
 import java.util.*;
 
 
-class FacemarkOnImage {
+public class FacemarkOnImage {
 
     /**
      * finds all faces on the image and return List with face mask.
@@ -18,9 +16,12 @@ class FacemarkOnImage {
      * @param img - image where method finds faces.
      * @return List with lists with points. Each list contains 29 points on face.
      */
-    static List<List<Point>> findFacemarkOnMat(Mat img) {
+    public static List<List<Point>> findFacemarkOnMat(Mat img) {
 
+        CascadeClassifier cascade =
+                new CascadeClassifier("./src/main/resources/haarcascades/haarcascade_frontalface_alt.xml");
         MatOfRect faces = new MatOfRect();
+        cascade.detectMultiScale(img, faces);
 
         Facemark fm = Face.createFacemarkKazemi();
         fm.loadModel("./src/main/resources/face_landmark_model.dat");
@@ -35,16 +36,10 @@ class FacemarkOnImage {
             for (int j = 0; j < lm.rows(); j++) {
                 double[] dp = lm.get(j, 0);
                 Point p = new Point(dp[0], dp[1]);
-                Imgproc.circle(img, p, 2, new Scalar(222), 1);
                 curr.add(p);
                 res.add(curr);
             }
         }
         return res;
     }
-
-   /* static List<Line> findFaceLines(List<Point> facemark){
-        List<Line> res = new ArrayList<>();
-        Line
-    }*/
 }
