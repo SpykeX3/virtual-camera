@@ -7,6 +7,7 @@ import ru.nsu.fit.VirtualCamera.Engine.Blocks.facedetection.FacemarkOnImage;
 import ru.nsu.fit.VirtualCamera.Engine.Frame;
 import ru.nsu.fit.VirtualCamera.Engine.FunctionalBlock;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.opencv.core.Core.BORDER_TRANSPARENT;
@@ -15,7 +16,7 @@ import static org.opencv.imgproc.Imgproc.*;
 public class FaceMaskBlock extends FunctionalBlock {
 
     public enum MaskType {
-        KITTY
+        BLUSH
     }
 
     private MaskType type;
@@ -28,57 +29,83 @@ public class FaceMaskBlock extends FunctionalBlock {
     public Frame performWork() {
         if (inputFrames.get(0) == null) return new Frame(new Mat());
         switch (type) {
-            case KITTY:
-                return new Frame(addKittyMask(inputFrames.get(0).getMatrix()));
+            case BLUSH:
+                return new Frame(addBlushMask(inputFrames.get(0).getMatrix()));
             default:
                 return new Frame(new Mat());
         }
     }
 
-    public Mat addKittyMask(Mat img) {
+    public Mat addBlushMask(Mat img) {
         List<List<Point>> faces = FacemarkOnImage.findFacemarkOnMat(img);
+        System.out.println(faces.size());
+        List<Point> prevList = new ArrayList<>();
         for (List<Point> currFace : faces) {
             //Point noseLeft = currFace.get(31);
             //Point noseRight = currFace.get(35);
+            System.out.println(currFace);
             Point noseDown = currFace.get(33);
             Point noseUp = currFace.get(30);
+            Point center = new Point((noseDown.x + noseUp.x)/2, (noseDown.y + noseUp.y)/2);
 
             //double noseWight = Math.sqrt(Math.pow(noseLeft.x - noseRight.x, 2) + Math.pow(noseLeft.y - noseRight.y, 2));
             double noseHeight = Math.sqrt(Math.pow(Math.abs(noseUp.x - noseDown.x), 2) + Math.pow(Math.abs(noseUp.y - noseDown.y), 2));
-            double kW = 40 / noseHeight;
-            Mat kitty1 = Imgcodecs.imread("./src/main/resources/masks/blush.png");
-            Mat kitty = new Mat();
-            Size sz = new Size(kitty1.size().width * kW, kitty1.size().height * kW);
-            Imgproc.resize(kitty1, kitty, sz);
-            //Mat kitty_colored = new Mat();
-            //Mat im_colored = new Mat();
-
-            //Imgproc.cvtColor(kitty, kitty_colored, 5);
-            //Imgproc.cvtColor(img, im_colored, 5);
-            //Core.add(im_colored,kitty_colored, res);
-            //res = im_colored + kitty_colored;
-            // img = addImage(img, kitty1,100,100);
-           /* Core.addWeighted(kitty1, 1, img.submat(
-                    new Rect(new Point(100,100), kitty1.size())), 1, 0, img.submat(
-                    new Rect(new Point(100,100), kitty1.size())));*/
-
-            img = addImage(img, kitty, 100, 100, 0);
-            return img;
+            double kW = 25 / noseHeight;
+            Mat blush_image = Imgcodecs.imread("./src/main/resources/masks/blush.png");
+            Mat blush_resized = new Mat();
+            Size sz = new Size(blush_image.size().width * kW, blush_image.size().height * kW);
+            Imgproc.resize(blush_image, blush_resized, sz);
+            Mat rotated = rotateImageUsingFacemark(img, currFace);
+            int x = (int)(center.x - blush_resized.size().width/2);
+            int y = (int)(center.y - blush_resized.size().height);
+            //System.out.println(x);
+            addImage(img, rotated, x, y, 0);
         }
         return img;
     }
+
+    /**
+     * y = ax + b.
+     * @return Pair (a,b)
+     */
+    private Point getAngle(List<Point> face){
+        Point left = face.get(36);
+        Point right = face.get(45);
+        double a = (double) (left.y - right.y) / (right.x - left.x);
+        double b = (double) (left.x * right.y - left.y * right.x) / (right.x - left.x);
+        return new Point(a,b);
+    }
+
+    private Mat rotateImageUsingFacemark(Mat img, List<Point> facemark){
+        Point ab = getAngle(facemark);
+        double angle = Math.atan(ab.x);
+
+        Point center = new Point(img.width()/2, img.height()/2);
+        Mat dst = new Mat(img.rows(), img.cols(), img.type());
+        //Creating the transformation matrix
+        Mat rotationMatrix = Imgproc.getRotationMatrix2D(center, 30, 1);
+        // Creating the object of the class Size
+        Size size = new Size(img.cols(), img.cols());
+        // Rotating the given image
+        Imgproc.warpAffine(img, dst, rotationMatrix, size);
+        return dst;
+    }
+
+
 
     private Mat addImage(Mat img1, Mat img2, int x, int y, int gaus) {
         int leftResize = 0;
         if (x < 0) leftResize = Math.abs(x);
         int rightResize = 0;
-        if (x + (int) img2.size().width > img1.size().width) rightResize = (int)img1.size().width - x;
+        if (x + (int) img2.size().width + 1 > img1.size().width) rightResize = (int)img2.size().width + x -
+                (int)img1.size().width + 1;
         int upResize = 0, downResize = 0;
         if (y < 0) downResize = Math.abs(y);
-        if (y + (int) img2.size().height > img1.size().height) downResize = (int)img1.size().height - y;
+        if (y + (int) img2.size().height  + 1> img1.size().height) downResize = (int)img2.size().height  + y -
+                (int)img1.size().height + 1;
 
-        rightResize = (int)img2.size().width -(rightResize-leftResize);
-        upResize = (int)img2.size().height - (upResize-downResize);
+        rightResize = (int)img2.size().width - Math.abs(rightResize-leftResize);
+        upResize = (int)img2.size().height - Math.abs(upResize-downResize);
 
         img2 = img2.submat(new Rect(new Point( leftResize, downResize),
                 new Size(rightResize, upResize)));
@@ -89,7 +116,7 @@ public class FaceMaskBlock extends FunctionalBlock {
 
         Mat mask = new Mat();
         switch (type){
-            case KITTY -> Imgproc.threshold(img2gray, mask, 150, 255, THRESH_BINARY);
+            case BLUSH -> Imgproc.threshold(img2gray, mask, 150, 255, THRESH_BINARY);
         }
         Mat mask_inv = new Mat();
         Core.bitwise_not(mask, mask_inv);

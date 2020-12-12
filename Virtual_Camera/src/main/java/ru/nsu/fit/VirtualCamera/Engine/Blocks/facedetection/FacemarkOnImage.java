@@ -31,14 +31,15 @@ public class FacemarkOnImage {
         List<List<Point>> res = new ArrayList<>();
 
         for (int i = 0; i < landmarks.size(); i++) {
+            System.out.println(landmarks.size());
             MatOfPoint2f lm = landmarks.get(i);
             List<Point> curr = new ArrayList<>();
             for (int j = 0; j < lm.rows(); j++) {
                 double[] dp = lm.get(j, 0);
                 Point p = new Point(dp[0], dp[1]);
                 curr.add(p);
-                res.add(curr);
             }
+            res.add(curr);
         }
         return res;
     }
