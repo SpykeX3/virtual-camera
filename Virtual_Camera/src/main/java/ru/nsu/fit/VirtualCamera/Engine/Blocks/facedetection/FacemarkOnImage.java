@@ -19,10 +19,11 @@ public class FacemarkOnImage {
     public static List<List<Point>> findFacemarkOnMat(Mat img) {
 
         CascadeClassifier cascade =
-                new CascadeClassifier("./src/main/resources/haarcascades/haarcascade_frontalface_alt.xml");
+                new CascadeClassifier("./src/main/resources/haarcascades/haarcascade_frontalface_alt_tree.xml");
         MatOfRect faces = new MatOfRect();
         cascade.detectMultiScale(img, faces);
 
+        System.out.println(faces.toArray().length);
         Facemark fm = Face.createFacemarkKazemi();
         fm.loadModel("./src/main/resources/face_landmark_model.dat");
 
@@ -31,14 +32,15 @@ public class FacemarkOnImage {
         List<List<Point>> res = new ArrayList<>();
 
         for (int i = 0; i < landmarks.size(); i++) {
+            System.out.println(landmarks.size());
             MatOfPoint2f lm = landmarks.get(i);
             List<Point> curr = new ArrayList<>();
             for (int j = 0; j < lm.rows(); j++) {
                 double[] dp = lm.get(j, 0);
                 Point p = new Point(dp[0], dp[1]);
                 curr.add(p);
-                res.add(curr);
             }
+            res.add(curr);
         }
         return res;
     }
