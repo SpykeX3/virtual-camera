@@ -9,12 +9,12 @@ import java.util.List;
 
 public class HorizontalMirror extends FunctionalBlock {
 
-  public HorizontalMirror(List<String> args) throws Exception {
+  public HorizontalMirror(List<String> args) throws IllegalArgumentException {
     validateArgs(args);
   }
 
   @Override
-  protected void validateArgs(List<String> args) throws Exception {}
+  protected void validateArgs(List<String> args) throws IllegalArgumentException {}
 
   @Override
   public Frame performWork() {

@@ -7,6 +7,7 @@ import org.opencv.videoio.VideoWriter;
 import org.opencv.videoio.Videoio;
 import ru.nsu.fit.VirtualCamera.Engine.Frame;
 import ru.nsu.fit.VirtualCamera.Engine.FunctionalBlock;
+import ru.nsu.fit.VirtualCamera.Engine.Misc;
 
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.util.List;
@@ -15,7 +16,7 @@ public class FileWritingBlock extends FunctionalBlock {
 
   private VideoWriter writer;
 
-  public FileWritingBlock(List<String> args) throws Exception {
+  public FileWritingBlock(List<String> args) throws IllegalArgumentException {
     validateArgs(args);
 
     String name = args.get(0);
@@ -36,7 +37,7 @@ public class FileWritingBlock extends FunctionalBlock {
   @Override
   public Frame performWork() {
 
-    writer.write(inputFrames.get(0).getMatrix());
+    writer.write(Misc.convertRGBAToBGR(inputFrames.get(0).getMatrix()));
     return null;
   }
 
@@ -46,13 +47,13 @@ public class FileWritingBlock extends FunctionalBlock {
   }
 
   @Override
-  protected void validateArgs(List<String> args) throws Exception {
-    if (args.size() != 6) throw new Exception("Invalid number of args");
+  protected void validateArgs(List<String> args) throws IllegalArgumentException {
+    if (args.size() != 6) throw new IllegalArgumentException("Invalid number of args");
     Integer.parseInt(args.get(1));
     Double.parseDouble(args.get(2));
     Double.parseDouble(args.get(3));
     Double.parseDouble(args.get(4));
     if (!(args.get(5).compareTo("true") == 0 || args.get(5).compareTo("false") == 0))
-      throw new Exception("Invalid boolean value");
+      throw new IllegalArgumentException("Invalid boolean value");
   }
 }
