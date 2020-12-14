@@ -36,16 +36,7 @@ public class CameraWritingBlock extends FunctionalBlock {
 
   @Override
   protected void validateArgs(List<String> args) throws IllegalArgumentException {
-    if (args.size() != 3) {
-      throw new IllegalArgumentException();
-    }
-    try {
-      int width = Integer.parseInt(args.get(1));
-      int height = Integer.parseInt(args.get(2));
-      if (height <= 0 || width <= 0) {
-        throw new IllegalArgumentException();
-      }
-    } catch (NumberFormatException e) {
+    if (args.size() != 1) {
       throw new IllegalArgumentException();
     }
     File file = new File(args.get(0));
