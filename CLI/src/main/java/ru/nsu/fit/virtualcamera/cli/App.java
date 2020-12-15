@@ -26,14 +26,16 @@ public class App {
         .addOption("v", "vsource", true, "Source video")
         .addOption("d", "dsource", true, "Source device")
         .addOption("h", "help", false, "Get help")
-        .addOption("f", "file", true, "Read JSON from file");
+        .addOption("f", "file", true, "Read JSON from file")
+        .addOption("x", true, "Screen width in pixels")
+        .addOption("y", true, "Screen height in pixels");
 
     try {
       CommandLine cmd = new DefaultParser().parse(options, args);
 
       if (cmd.hasOption("h")) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("[-h] [-t target] [-v vsource | -d dsource]", options);
+        formatter.printHelp("[-h] [-t target] [-v vsource | -d dsource] [-x width -y height]", options);
       } else {
 
         if (!cmd.hasOption("v") && !cmd.hasOption("d") && !cmd.hasOption("f")) {
@@ -90,10 +92,14 @@ public class App {
                 .put("args", new JSONArray());
           }
 
+          JSONArray outputArgs = new JSONArray().put(target);
+          if (cmd.hasOption("x") && cmd.hasOption(("y"))) {
+            outputArgs.put(cmd.getOptionValue("x")).put(cmd.getOptionValue("y"));
+          }
           jsonObject = new JSONObject()
               .put("module_name", "device_output")
               .put("inputs", new JSONArray().put(jsonObject))
-              .put("args", new JSONArray().put(target));
+              .put("args", outputArgs);
 
           jsonObject = new JSONObject()
               .put("command", "configure")

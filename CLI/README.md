@@ -17,6 +17,10 @@ Reading from file:
 ```
 -f config.json
 ```
+Additionally, width and height (in pixels) for the output device can be specified as arguments for the corresponding functional block. Use `-x` and `-y` keys for that:
+```
+-v file.avi -t video1 -x 1920 -y 1080
+```
 
 ## Details
 Currently the CLI connects to the daemon via WebSocket. Currently it supports the following:
