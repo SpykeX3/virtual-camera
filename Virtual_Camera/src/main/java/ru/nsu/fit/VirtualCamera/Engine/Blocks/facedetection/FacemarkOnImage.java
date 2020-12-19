@@ -19,7 +19,7 @@ public class FacemarkOnImage {
     public static List<List<Point>> findFacemarkOnMat(Mat img) {
 
         CascadeClassifier cascade =
-                new CascadeClassifier("./src/main/resources/haarcascades/haarcascade_frontalface_alt_tree.xml");
+                new CascadeClassifier("./src/main/resources/haarcascades/haarcascade_frontalface_alt.xml");
         MatOfRect faces = new MatOfRect();
         cascade.detectMultiScale(img, faces);
 
