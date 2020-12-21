@@ -55,7 +55,7 @@ public class CameraWritingBlock extends FunctionalBlock {
 
         if (mat.height() == -1) {
             System.out.println(framesCount);
-            assert mat.height() != -1;
+            return null;
         }
 
         mat = Misc.convertRGBAToRGB(mat);
