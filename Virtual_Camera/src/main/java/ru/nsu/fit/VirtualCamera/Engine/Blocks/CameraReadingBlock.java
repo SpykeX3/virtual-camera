@@ -17,54 +17,49 @@ import java.util.List;
 
 public class CameraReadingBlock extends FunctionalBlock {
 
-	private VideoCapture capture;
+    private VideoCapture capture;
 
-	public CameraReadingBlock(List<String> args) throws IllegalArgumentException
-	{
-		validateArgs(args);
-		capture = new VideoCapture();
-		capture.open(Integer.parseInt(args.get(0)));
-	}
+    public CameraReadingBlock(List<String> args) throws IllegalArgumentException {
+        super(args);
+        capture = new VideoCapture();
+        capture.open(Integer.parseInt(args.get(0)));
+    }
 
-	public double getFPS()
-	{
+    public double getFPS() {
 
-		return capture.get(Videoio.CAP_PROP_FPS);
-	}
+        return capture.get(Videoio.CAP_PROP_FPS);
+    }
 
-	public int getFourcc()
-	{
+    public int getFourcc() {
 
-		return (int) capture.get(Videoio.CAP_PROP_FOURCC);
-	}
+        return (int) capture.get(Videoio.CAP_PROP_FOURCC);
+    }
 
-	public Size getSize()
-	{
+    public Size getSize() {
 
-		Size size = new Size();
-		size.height = capture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
-		size.width = capture.get(Videoio.CAP_PROP_FRAME_WIDTH);
-		return size;
-	}
+        Size size = new Size();
+        size.height = capture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
+        size.width = capture.get(Videoio.CAP_PROP_FRAME_WIDTH);
+        return size;
+    }
 
-	@Override
-	protected void validateArgs(List<String> args) throws IllegalArgumentException
-	{
+    @Override
+    protected void validateArgs(List<String> args) throws IllegalArgumentException {
 
-		if (args.size() != 1) throw new IllegalArgumentException("Invalid args number");
-		Integer.parseInt(args.get(0));
-	}
+        if (args.size() != 1) throw new IllegalArgumentException("Invalid args number");
+        Integer.parseInt(args.get(0));
+    }
 
-	@Override
-	public Frame performWork()
-	{
+    @Override
+    public Frame performWork() {
 
-		Mat mat = new Mat();
-		Frame frame = new Frame(Misc.convertBGRToRGBA(mat));
-		return frame;
-	}
+        Mat mat = new Mat();
+        Frame frame = new Frame(Misc.convertBGRToRGBA(mat));
+        return frame;
+    }
 
-	@Override
-	protected void aftermath() {}
+    @Override
+    protected void aftermath() {
+    }
 
 }

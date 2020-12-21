@@ -63,13 +63,12 @@ public class ConfigurationHandler {
   private FrameStream processFBTree(JSONObject jsonFB) throws JSONException {
     FrameStream stream = new FrameStream(64);
     String moduleName = jsonFB.getString("module_name");
-    ArrayList<String> argList = null;
+    ArrayList<String> argList = new ArrayList<>();
     LinkedList<FrameStream> inputsList = new LinkedList<>();
 
     JSONArray args = jsonFB.optJSONArray("args");
     if (args != null) {
       int len = args.length();
-      argList = new ArrayList<>(len);
       for (int i = 0; i < len; i++) {
         argList.add(args.getString(i));
       }
