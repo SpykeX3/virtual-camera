@@ -43,7 +43,21 @@ public class CameraWritingBlock extends FunctionalBlock {
 
     @Override
     public Frame performWork() throws InterruptedException {
+        framesCount++;
         Mat mat = inputFrames.get(0).getMatrix();
+
+        //Last frame, should turn off camera
+        if (inputFrames.get(0).isLast()) {
+            kill();
+            return null;
+        }
+
+
+        if (mat.height() == -1) {
+            System.out.println(framesCount);
+            assert mat.height() != -1;
+        }
+
         mat = Misc.convertRGBAToRGB(mat);
         if (!opened) {
             opened = true;
