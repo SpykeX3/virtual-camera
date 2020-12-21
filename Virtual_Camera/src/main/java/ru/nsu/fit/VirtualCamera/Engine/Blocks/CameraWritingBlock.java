@@ -43,7 +43,8 @@ public class CameraWritingBlock extends FunctionalBlock {
 
     @Override
     public Frame performWork() throws InterruptedException {
-        Mat mat = Misc.convertRGBAToRGB(inputFrames.get(0).getMatrix());
+        Mat mat = inputFrames.get(0).getMatrix();
+        mat = Misc.convertRGBAToRGB(mat);
         if (!opened) {
             opened = true;
             fd = fakecam.open(name, mat.cols(), mat.rows());

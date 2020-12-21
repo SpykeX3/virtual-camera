@@ -60,10 +60,15 @@ public class FileReadingBlock extends FunctionalBlock {
     @Override
     public Frame performWork() {
         Mat mat = new Mat();
-        Frame frame = new Frame(Misc.convertBGRToRGBA(mat));
-        if (markLastFrame && !capture.read(mat)) {
-            frame.setLast(true);
-            kill();
+        Frame frame;
+        if (capture.read(mat)) {
+            frame = new Frame(Misc.convertBGRToRGBA(mat));
+        } else {
+            frame = new Frame(mat);
+            if (markLastFrame) {
+                frame.setLast(true);
+                kill();
+            }
         }
         return frame;
     }
