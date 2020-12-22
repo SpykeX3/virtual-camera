@@ -12,55 +12,59 @@ import java.util.List;
 
 public class FileReadingBlock extends FunctionalBlock {
 
-  private VideoCapture capture;
-  private boolean markLastFrame;
+    private final VideoCapture capture;
+    private final boolean markLastFrame;
 
-  public FileReadingBlock(List<String> args) throws Exception {
-    validateArgs(args);
-    capture = new VideoCapture();
+    public FileReadingBlock(List<String> args) throws Exception {
+        validateArgs(args);
+        capture = new VideoCapture();
 
-    String name = args.get(0);
+        String name = args.get(0);
 
-    capture.open(name);
-
-    this.markLastFrame = Boolean.parseBoolean(args.get(1));
-  }
-
-  public double getFPS() {
-    return capture.get(Videoio.CAP_PROP_FPS);
-  }
-
-  public int getFourcc() {
-    return (int) capture.get(Videoio.CAP_PROP_FOURCC);
-  }
-
-  public Size getSize() {
-    Size size = new Size();
-    size.height = capture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
-    size.width = capture.get(Videoio.CAP_PROP_FRAME_WIDTH);
-    return size;
-  }
-
-  @Override
-  protected void validateArgs(List<String> args) throws Exception {
-    if (args.size() != 2) throw new Exception("Invalid number of args");
-    File f = new File(args.get(0));
-    // if (!f.exists() || f.isDirectory()) throw new Exception("Invalid file");
-    if (!(args.get(1).compareTo("true") == 0 || args.get(1).compareTo("false") == 0))
-      throw new Exception("Invalid boolean value");
-  }
-
-  @Override
-  public Frame performWork() {
-    Mat mat = new Mat();
-    Frame frame = new Frame(mat);
-    if (markLastFrame && !capture.read(mat)) {
-      frame.setLast(true);
-      kill();
+        capture.open(name);
+        if (args.size() == 2) {
+            this.markLastFrame = Boolean.parseBoolean(args.get(1));
+        } else {
+            this.markLastFrame = true;
+        }
     }
-    return frame;
-  }
 
-  @Override
-  protected void aftermath() {}
+    public double getFPS() {
+        return capture.get(Videoio.CAP_PROP_FPS);
+    }
+
+    public int getFourcc() {
+        return (int) capture.get(Videoio.CAP_PROP_FOURCC);
+    }
+
+    public Size getSize() {
+        Size size = new Size();
+        size.height = capture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
+        size.width = capture.get(Videoio.CAP_PROP_FRAME_WIDTH);
+        return size;
+    }
+
+    @Override
+    protected void validateArgs(List<String> args) throws Exception {
+        if (args.size() > 2 || args.size() == 0) throw new Exception("Invalid number of args");
+        File f = new File(args.get(0));
+        if (!f.exists() || f.isDirectory()) throw new Exception("Invalid file");
+        if (args.size() == 2 && !(args.get(1).compareTo("true") == 0 || args.get(1).compareTo("false") == 0))
+            throw new Exception("Invalid boolean value");
+    }
+
+    @Override
+    public Frame performWork() {
+        Mat mat = new Mat();
+        Frame frame = new Frame(mat);
+        if (markLastFrame && !capture.read(mat)) {
+            frame.setLast(true);
+            kill();
+        }
+        return frame;
+    }
+
+    @Override
+    protected void aftermath() {
+    }
 }
