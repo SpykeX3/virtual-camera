@@ -1,0 +1,9 @@
+language: java
+install: skip
+
+os: linux
+dist: xenial
+jdk: oraclejdk11
+
+script:
+  - ./Virtual_Camera/gradlew build --scan -s
