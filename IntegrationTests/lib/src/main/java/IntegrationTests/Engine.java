@@ -14,7 +14,7 @@ public class Engine {
         }
     }
 
-    private void stop() {
+    public void stop() {
         if (engine != null) {
             engine.destroyForcibly();
             engine = null;

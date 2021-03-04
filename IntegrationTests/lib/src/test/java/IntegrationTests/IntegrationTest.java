@@ -4,13 +4,60 @@
 package IntegrationTests;
 
 import org.junit.Test;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
+
+import java.nio.file.Paths;
+
+import static org.junit.Assert.*;
 
 
 public class IntegrationTest {
     @Test
     public void testMirrorImage() {
-        VideoCapture c = new VideoCapture();
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        String cwd = Paths.get("").toAbsolutePath().toString();
+        Engine engine = new Engine(cwd + "/../../Virtual_Camera/");
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            engine.stop();
+            fail();
+        }
+        CLI client = new CLI(cwd + "/../../CLI/");
+        client.execute(new String[]{"-v", cwd + "/src/test/resources/testVideo.mp4", "-tf",
+                cwd + "/src/test/resources/output.mp4", "vertical_mirror"});
 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            engine.stop();
+            fail();
+        }
+        VideoCapture input = new VideoCapture();
+        input.setExceptionMode(true);
+        input.open(cwd + "/src/test/resources/testVideo.mp4");
+        assertTrue(input.isOpened());
+        VideoCapture output = new VideoCapture();
+        input.open(cwd + "/src/test/resources/output.mp4");
+        Mat in = new Mat();
+        Mat out = new Mat();
+        input.read(in);
+        output.read(out);
+        int h = in.rows();
+        int w = in.cols();
+        assertTrue(h > 0);
+        assertTrue(w > 0);
+        assertEquals(h, out.rows());
+        assertEquals(w, out.cols());
+        for (int i = 0; i < 100; i++) {
+            double[] sampleOrig = in.get(1, 1);
+            double[] sampleTest = in.get(h - 1, 1);
+            assertArrayEquals(sampleOrig, sampleTest, 0.01);
+        }
+        engine.stop();
     }
 }
